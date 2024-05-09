@@ -1,4 +1,4 @@
-package b3
+package config
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ type Config struct {
 	Posts []string `json:"posts"`
 }
 
-func NewConfig(rootPath string) (Config, error) {
+func New(rootPath string) (Config, error) {
 	data, err := os.ReadFile(filepath.Join(rootPath, CONFIG_FILE_NAME))
 
 	if err != nil {

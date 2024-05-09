@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/mtratsiuk/b3/b3"
+	"github.com/mtratsiuk/b3/pkg/app"
 )
 
 var verbose bool
@@ -27,26 +27,34 @@ func init() {
 }
 
 func main() {
-	log := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
 	flag.Parse()
 
-	log.Info(fmt.Sprintf("got args: verbose=%v, help=%v, rootPath=%v", verbose, help, rootPath))
+	logLevel := slog.LevelWarn
+
+	if verbose {
+		logLevel = slog.LevelDebug
+	}
+
+	log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
+
+	log.Debug(fmt.Sprintf("got args: verbose=%v, help=%v, rootPath=%v", verbose, help, rootPath))
 
 	if help {
 		flag.PrintDefaults()
 	}
 
-	b3app, err := b3.NewApp(b3.Params{
-		Log: log,
-		Verbose: verbose,
+	b3app, err := app.New(app.Params{
+		Log:      log,
+		Verbose:  verbose,
 		RootPath: rootPath,
 	})
 
 	if err != nil {
-		log.Error(err.Error())
+		log.Error(fmt.Sprintf("main: failed to create b3 app: %v", err))
 		os.Exit(1)
 	}
 
-	fmt.Printf("%v", b3app)
+	if err = b3app.Build(); err != nil {
+		log.Error(fmt.Sprintf("main: failed to build: %v", err))
+	}
 }
