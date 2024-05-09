@@ -26,21 +26,21 @@ func New() (Templates, error) {
 	return t, nil
 }
 
-type PostViewModel struct {
+type PostData struct {
 	Title     string
-	PostHtml  string
+	PostHtml  template.HTML
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func (t Templates) RenderPost(wr io.Writer, model PostViewModel) error {
-	return t.views.ExecuteTemplate(wr, "post.html", model)
+func (t Templates) RenderPost(wr io.Writer, data PostData) error {
+	return t.views.ExecuteTemplate(wr, "post.html", data)
 }
 
-type HomeViewModel struct {
+type HomeData struct {
 	Title string
 }
 
-func (t Templates) RenderHome(wr io.Writer, model PostViewModel) error {
-	return t.views.ExecuteTemplate(wr, "home.html", model)
+func (t Templates) RenderHome(wr io.Writer, data HomeData) error {
+	return t.views.ExecuteTemplate(wr, "home.html", data)
 }

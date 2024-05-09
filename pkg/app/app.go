@@ -1,7 +1,9 @@
 package app
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -11,6 +13,7 @@ import (
 	"github.com/mtratsiuk/b3/pkg/config"
 	"github.com/mtratsiuk/b3/pkg/templates"
 	"github.com/mtratsiuk/b3/pkg/timestamper"
+	"github.com/yuin/goldmark"
 )
 
 type Params struct {
@@ -124,13 +127,24 @@ func (app *App) renderPost(post *Post) error {
 	}
 	defer out.Close()
 
-	model := templates.PostViewModel{
+	in, err := os.ReadFile(post.FilePath)
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+	if err := goldmark.Convert(in, &buf); err != nil {
+		return err
+	}
+
+	data := templates.PostData{
 		Title: string(post.Id),
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
+		PostHtml: template.HTML(buf.String()),
 	}
 
-	app.templates.RenderPost(out, model)
+	app.templates.RenderPost(out, data)
 
 	return nil
 }

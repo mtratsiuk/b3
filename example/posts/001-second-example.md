@@ -1,7 +1,15 @@
 # Second example post
 
-Second example post. This one is even more important obviously.
+Another important text. Even more important than the last one obviously.
 
 ## Header 2
 
-Some text here.
+More text here.
+
+## Some code snippet
+
+```go
+func main() {
+  panic()
+}
+```
