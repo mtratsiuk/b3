@@ -54,7 +54,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = b3app.Build(); err != nil {
+	if _, err := b3app.Build(); err != nil {
 		log.Error(fmt.Sprintf("main: failed to build: %v", err))
 	}
 }

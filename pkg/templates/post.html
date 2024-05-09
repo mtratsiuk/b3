@@ -1,0 +1,9 @@
+{{template "base.html" .}}
+
+{{define "title"}}{{.Title}}{{end}}
+
+{{define "body"}}
+<main class="b3-post">
+  {{.PostHtml}}
+</main>
+{{end}}

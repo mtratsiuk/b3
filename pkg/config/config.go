@@ -10,7 +10,8 @@ import (
 const CONFIG_FILE_NAME = "b3.json"
 
 type Config struct {
-	Posts []string `json:"posts"`
+	Posts   []string `json:"posts"`
+	OutPath string   `json:"out_path"`
 }
 
 func New(rootPath string) (Config, error) {

@@ -3,11 +3,13 @@ package app
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/mtratsiuk/b3/pkg/config"
+	"github.com/mtratsiuk/b3/pkg/templates"
 	"github.com/mtratsiuk/b3/pkg/timestamper"
 )
 
@@ -21,7 +23,9 @@ type App struct {
 	log         *slog.Logger
 	params      Params
 	config      config.Config
+	outDirPath  string
 	timestamper timestamper.Timestamper
+	templates   templates.Templates
 }
 
 type Post struct {
@@ -35,31 +39,44 @@ type PostId string
 
 func New(params Params) (App, error) {
 	cfg, err := config.New(params.RootPath)
-
 	if err != nil {
 		return App{}, fmt.Errorf("app.New: failed to create config: %v", err)
 	}
-
 	params.Log.Debug(fmt.Sprintf("app.New: created config: %v", cfg))
+
+	tmplts, err := templates.New()
+	if err != nil {
+		return App{}, fmt.Errorf("app.New: failed to load templates: %v", err)
+	}
 
 	return App{
 		log:         params.Log,
 		params:      params,
 		config:      cfg,
+		outDirPath:  filepath.Join(params.RootPath, cfg.OutPath),
 		timestamper: timestamper.NewGit(),
+		templates:   tmplts,
 	}, nil
 }
 
-func (app *App) Build() error {
-	posts := make(map[PostId]Post, 0)
+func (app *App) ResolveRelativePath(path string) string {
+	return filepath.Join(app.params.RootPath, path)
+}
+
+func (app *App) Build() (map[PostId]*Post, error) {
+	posts := make(map[PostId]*Post, 0)
+
+	if err := os.MkdirAll(app.outDirPath, os.ModePerm); err != nil {
+		return posts, fmt.Errorf("app.Build: failed to create out directory: %v", err)
+	}
 
 	for _, pg := range app.config.Posts {
-		glob := filepath.Join(app.params.RootPath, pg)
+		glob := app.ResolveRelativePath(pg)
 
 		matches, err := filepath.Glob(glob)
 
 		if err != nil {
-			return fmt.Errorf("app.Build: failed to match glob pattern '%v': %v", glob, err)
+			return posts, fmt.Errorf("app.Build: failed to match glob pattern '%v': %v", glob, err)
 		}
 
 		for _, p := range matches {
@@ -84,15 +101,36 @@ func (app *App) Build() error {
 			}
 			post.UpdatedAt = updatedAt
 
-			// TODO: render post
+			err = app.renderPost(&post)
+			if err != nil {
+				return posts, fmt.Errorf("app.Build: failed to render post %v: %v", post, err)
+			}
+			app.log.Debug(fmt.Sprintf("app.Build: rendered post: %v", post))
 
-			posts[post.Id] = post
-
-			app.log.Debug(fmt.Sprintf("app.Build: created post: %v", post))
+			posts[post.Id] = &post
+			app.log.Debug(fmt.Sprintf("app.Build: finished processing post: %v", post))
 		}
 	}
 
 	// TODO: render home page
+
+	return posts, nil
+}
+
+func (app *App) renderPost(post *Post) error {
+	out, err := os.Create(filepath.Join(app.outDirPath, string(post.Id) + ".html"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	model := templates.PostViewModel{
+		Title: string(post.Id),
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,
+	}
+
+	app.templates.RenderPost(out, model)
 
 	return nil
 }

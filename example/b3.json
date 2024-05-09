@@ -1,4 +1,5 @@
 {
+  "out_path": "./out",
   "posts": [
     "./posts/*.md"
   ]
