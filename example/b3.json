@@ -1,6 +1,9 @@
 {
-  "out_path": "./out",
-  "posts": [
+  "out_dir_path": "./out",
+  "posts_glob": [
     "./posts/*.md"
+  ],
+  "assets_dir_path": [
+    "./assets"
   ]
 }

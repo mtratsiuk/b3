@@ -10,6 +10,9 @@ import (
 //go:embed *.html
 var viewsFs embed.FS
 
+//go:embed base.css
+var baseCss template.CSS
+
 type Templates struct {
 	post *template.Template
 	home *template.Template
@@ -30,6 +33,12 @@ func New() (Templates, error) {
 	return t, nil
 }
 
+type BaseData[T any] struct {
+	Title    string
+	Css      template.CSS
+	PageData T
+}
+
 type PostData struct {
 	Title     string
 	PostHtml  template.HTML
@@ -38,7 +47,11 @@ type PostData struct {
 }
 
 func (t Templates) RenderPost(wr io.Writer, data PostData) error {
-	return t.post.ExecuteTemplate(wr, "post.html", data)
+	return t.post.ExecuteTemplate(wr, "post.html", BaseData[PostData]{
+		Title:    data.Title,
+		Css:      baseCss,
+		PageData: data,
+	})
 }
 
 type HomeData struct {
@@ -55,5 +68,9 @@ type HomePostData struct {
 }
 
 func (t Templates) RenderHome(wr io.Writer, data HomeData) error {
-	return t.home.ExecuteTemplate(wr, "home.html", data)
+	return t.home.ExecuteTemplate(wr, "home.html", BaseData[HomeData]{
+		Title:    data.Title,
+		Css:      baseCss,
+		PageData: data,
+	})
 }

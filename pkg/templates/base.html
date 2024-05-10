@@ -5,10 +5,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{block "title" .}}{{end}}</title>
+  <style>{{.Css}}</style>
 </head>
 
-<body>
-  {{block "body" .}}{{end}}
+<body class="m-1">
+  {{block "body" .PageData}}{{end}}
 </body>
 
 </html>

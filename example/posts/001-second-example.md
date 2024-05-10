@@ -11,6 +11,11 @@ Even more after blank line.
 
 > Some quote.
 
+## Some image
+
+Here is an image:
+![cat](../assets/000_cat.jpg)
+
 ## Some code snippet
 
 ```go

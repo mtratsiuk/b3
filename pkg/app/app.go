@@ -13,6 +13,7 @@ import (
 	"github.com/mtratsiuk/b3/pkg/config"
 	"github.com/mtratsiuk/b3/pkg/templates"
 	"github.com/mtratsiuk/b3/pkg/timestamper"
+	"github.com/mtratsiuk/b3/pkg/utils"
 	"github.com/yuin/goldmark"
 )
 
@@ -32,15 +33,18 @@ type App struct {
 }
 
 type Post struct {
-	Id          PostId
-	FilePath    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Title       template.HTML
-	Description template.HTML
+	Id           PostId
+	FilePath     string
+	HtmlFilePath string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Title        template.HTML
+	Description  template.HTML
 }
 
 type PostId string
+
+type Posts = map[PostId]*Post
 
 func New(params Params) (App, error) {
 	cfg, err := config.New(params.RootPath)
@@ -58,7 +62,7 @@ func New(params Params) (App, error) {
 		log:         params.Log,
 		params:      params,
 		config:      cfg,
-		outDirPath:  filepath.Join(params.RootPath, cfg.OutPath),
+		outDirPath:  filepath.Join(params.RootPath, cfg.OutDirPath),
 		timestamper: timestamper.NewGit(),
 		templates:   tmplts,
 	}, nil
@@ -68,24 +72,41 @@ func (app *App) ResolveRelativePath(path string) string {
 	return filepath.Join(app.params.RootPath, path)
 }
 
-func (app *App) Build() (map[PostId]*Post, error) {
-	posts := make(map[PostId]*Post, 0)
-
+func (app *App) Build() (Posts, error) {
 	if err := os.MkdirAll(app.outDirPath, os.ModePerm); err != nil {
-		return posts, fmt.Errorf("app.Build: failed to create out directory: %v", err)
+		return nil, fmt.Errorf("app.Build: failed to create out directory: %v", err)
 	}
 
-	for _, pg := range app.config.Posts {
+	if err := app.copyAssets(); err != nil {
+		return nil, fmt.Errorf("app.Build: failed to copy assets to out directory: %v", err)
+	}
+
+	posts, err := app.renderPosts()
+	if err != nil {
+		return nil, fmt.Errorf("app.Build: failed to render posts: %v", err)
+	}
+
+	if err := app.renderHome(posts); err != nil {
+		return nil, fmt.Errorf("app.Build: failed to render home page: %v", err)
+	}
+
+	return posts, nil
+}
+
+func (app *App) renderPosts() (Posts, error) {
+	posts := make(Posts, 0)
+
+	for _, pg := range app.config.PostsGlob {
 		glob := app.ResolveRelativePath(pg)
 
 		matches, err := filepath.Glob(glob)
 
 		if err != nil {
-			return posts, fmt.Errorf("app.Build: failed to match glob pattern '%v': %v", glob, err)
+			return posts, fmt.Errorf("renderPosts: failed to match glob pattern '%v': %v", glob, err)
 		}
 
 		for _, p := range matches {
-			app.log.Debug(fmt.Sprintf("app.Build: processing post match: %v", p))
+			app.log.Debug(fmt.Sprintf("renderPosts: processing post match: %v", p))
 
 			filename := filepath.Base(p)
 			title, _ := strings.CutSuffix(filename, filepath.Ext(filename))
@@ -96,28 +117,24 @@ func (app *App) Build() (map[PostId]*Post, error) {
 
 			createdAt, err := app.timestamper.CreatedAt(p)
 			if err != nil {
-				app.log.Warn(fmt.Sprintf("app.Build: failed to read CreatedAt time: %v", err))
+				app.log.Warn(fmt.Sprintf("renderPosts: failed to read CreatedAt time: %v", err))
 			}
 			post.CreatedAt = createdAt
 
 			updatedAt, err := app.timestamper.UpdatedAt(p)
 			if err != nil {
-				app.log.Warn(fmt.Sprintf("app.Build: failed to read UpdatedAt time: %v", err))
+				app.log.Warn(fmt.Sprintf("renderPosts: failed to read UpdatedAt time: %v", err))
 			}
 			post.UpdatedAt = updatedAt
 
 			err = app.renderPost(&post)
 			if err != nil {
-				return posts, fmt.Errorf("app.Build: failed to render post %v: %v", post, err)
+				return posts, fmt.Errorf("renderPosts: failed to render post %v: %v", post, err)
 			}
-			app.log.Debug(fmt.Sprintf("app.Build: rendered post: %v", post))
+			app.log.Debug(fmt.Sprintf("renderPosts: rendered post: %v", post))
 
 			posts[post.Id] = &post
 		}
-	}
-
-	if err := app.renderHome(posts); err != nil {
-		return posts, fmt.Errorf("app.Build: failed to render home page: %v", err)
 	}
 
 	return posts, nil
@@ -154,7 +171,13 @@ func (app *App) renderPost(post *Post) error {
 		PostHtml:  template.HTML(html),
 	}
 
-	out, err := os.Create(filepath.Join(app.outDirPath, string(post.Id)+".html"))
+	postOutDirPath := filepath.Join(app.outDirPath, strings.TrimPrefix(filepath.Dir(post.FilePath), filepath.Clean(app.params.RootPath)))
+	if err := os.MkdirAll(postOutDirPath, os.ModePerm); err != nil {
+		return err
+	}
+	post.HtmlFilePath = filepath.Join(postOutDirPath, string(post.Id)+".html")
+
+	out, err := os.Create(post.HtmlFilePath)
 	if err != nil {
 		return err
 	}
@@ -174,7 +197,7 @@ func (app *App) renderHome(posts map[PostId]*Post) error {
 			Description: p.Description,
 			CreatedAt:   p.CreatedAt,
 			UpdatedAt:   p.UpdatedAt,
-			Url:         fmt.Sprintf("%v.html", p.Id), // TODO: strip .html for github pages build
+			Url:         filepath.Join(".", strings.TrimPrefix(p.HtmlFilePath, filepath.Clean(app.outDirPath))), // TODO: strip .html for github pages build
 		})
 	}
 
@@ -187,6 +210,16 @@ func (app *App) renderHome(posts map[PostId]*Post) error {
 	defer out.Close()
 
 	return app.templates.RenderHome(out, data)
+}
+
+func (app *App) copyAssets() error {
+	for _, dir := range app.config.AssetsDirPath {
+		if err := utils.CopyDir(app.ResolveRelativePath(dir), filepath.Join(app.outDirPath, dir)); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // TODO: walk ast
