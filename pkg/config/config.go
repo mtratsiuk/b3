@@ -10,9 +10,16 @@ import (
 const CONFIG_FILE_NAME = "b3.json"
 
 type Config struct {
-	PostsGlob     []string `json:"posts_glob"`
-	OutDirPath   string   `json:"out_dir_path"`
-	AssetsDirPath []string `json:"assets_dir_path"`
+	PostsGlob     []string           `json:"posts_glob"`
+	OutDirPath    string             `json:"out_dir_path"`
+	AssetsDirPath []string           `json:"assets_dir_path"`
+	HomeLink      string             `json:"home_link"`
+	HeaderLinks   []ConfigHeaderLink `json:"header_links"`
+}
+
+type ConfigHeaderLink struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
 
 func New(rootPath string) (Config, error) {

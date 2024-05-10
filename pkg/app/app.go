@@ -54,7 +54,7 @@ func New(params Params) (App, error) {
 	}
 	params.Log.Debug(fmt.Sprintf("app.New: created config: %v", cfg))
 
-	tmplts, err := templates.New()
+	tmplts, err := templates.New(cfg)
 	if err != nil {
 		return App{}, fmt.Errorf("app.New: failed to load templates: %v", err)
 	}

@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"io"
 	"time"
+
+	"github.com/mtratsiuk/b3/pkg/config"
 )
 
 //go:embed *.html
@@ -14,11 +16,12 @@ var viewsFs embed.FS
 var baseCss template.CSS
 
 type Templates struct {
-	post *template.Template
-	home *template.Template
+	config config.Config
+	post   *template.Template
+	home   *template.Template
 }
 
-func New() (Templates, error) {
+func New(cfg config.Config) (Templates, error) {
 	post, err := template.ParseFS(viewsFs, "base.html", "post.html")
 	if err != nil {
 		return Templates{}, err
@@ -29,13 +32,14 @@ func New() (Templates, error) {
 		return Templates{}, err
 	}
 
-	t := Templates{post, home}
+	t := Templates{cfg, post, home}
 	return t, nil
 }
 
 type BaseData[T any] struct {
 	Title    string
 	Css      template.CSS
+	Config   config.Config
 	PageData T
 }
 
@@ -50,6 +54,7 @@ func (t Templates) RenderPost(wr io.Writer, data PostData) error {
 	return t.post.ExecuteTemplate(wr, "post.html", BaseData[PostData]{
 		Title:    data.Title,
 		Css:      baseCss,
+		Config:   t.config,
 		PageData: data,
 	})
 }
@@ -72,6 +77,7 @@ func (t Templates) RenderHome(wr io.Writer, data HomeData) error {
 	return t.home.ExecuteTemplate(wr, "home.html", BaseData[HomeData]{
 		Title:    data.Title,
 		Css:      baseCss,
+		Config:   t.config,
 		PageData: data,
 	})
 }

@@ -5,5 +5,20 @@
   ],
   "assets_dir_path": [
     "./assets"
+  ],
+  "home_link": "https://misha.spris.dev/b3",
+  "header_links": [
+    {
+      "name": "misha.spris.dev",
+      "url": "https://misha.spris.dev"
+    },
+    {
+      "name": "github.com/mtratsiuk",
+      "url": "https://github.com/mtratsiuk"
+    },
+    {
+      "name": "linkedin.com/in/mtratsiuk",
+      "url": "https://www.linkedin.com/in/mtratsiuk/"
+    }
   ]
 }
