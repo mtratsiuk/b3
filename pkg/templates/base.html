@@ -8,8 +8,20 @@
   <style>{{.Css}}</style>
 </head>
 
-<body class="m-1">
-  {{block "body" .PageData}}{{end}}
+<body class="p-1 flex flex-column flex-align-center">
+  <header class="b3-header z-index-1 flex flex-wrap">
+    <div class="b3-header__home border border-plain shadow p-smaller">
+      <a href="https://blog.misha.spris.dev">home</a>
+    </div>
+    <div class="b3-header__links flex-grow flex flex-wrap flex-justify-between border border-plain shadow p-smaller">
+      <a href="https://blog.misha.spris.dev">misha.spris.dev</a>
+      <a href="https://misha.spris.dev">misha.spris.dev</a>
+      <a href="https://github.com/mtratsiuk">github.com/mtratsiuk</a>
+    </div>
+  </header>
+  <div class="b3-main">
+    {{block "body" .PageData}}{{end}}
+  </div>
 </body>
 
 </html>

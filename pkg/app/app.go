@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -193,6 +194,7 @@ func (app *App) renderHome(posts map[PostId]*Post) error {
 
 	for _, p := range posts {
 		data.Posts = append(data.Posts, templates.HomePostData{
+			Id:          string(p.Id),
 			Title:       p.Title,
 			Description: p.Description,
 			CreatedAt:   p.CreatedAt,
@@ -200,6 +202,16 @@ func (app *App) renderHome(posts map[PostId]*Post) error {
 			Url:         filepath.Join(".", strings.TrimPrefix(p.HtmlFilePath, filepath.Clean(app.outDirPath))), // TODO: strip .html for github pages build
 		})
 	}
+
+	slices.SortFunc(data.Posts, func(a, b templates.HomePostData) int {
+		createdAtCmp := b.CreatedAt.Compare(a.CreatedAt)
+
+		if createdAtCmp == 0 {
+			return strings.Compare(b.Id, a.Id)
+		}
+
+		return createdAtCmp
+	})
 
 	app.log.Debug(fmt.Sprintf("renderHome: data: %v", data))
 

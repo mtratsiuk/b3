@@ -60,6 +60,7 @@ type HomeData struct {
 }
 
 type HomePostData struct {
+	Id          string
 	Url         string
 	Title       template.HTML
 	Description template.HTML

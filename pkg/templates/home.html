@@ -6,12 +6,15 @@
 <main class="b3-home">
     <div class="b3-posts">
         {{range .Posts}}
-        <div class="b3-post">
-            <a href="{{.Url}}">
+        <div class="b3-posts__post border p-smaller flex flex-column">
+            <a href="{{.Url}}" class="b3-posts__title">
                 <h3>{{.Title}}</h3>
             </a>
-            <span>{{.CreatedAt}}</span>
-            <p>{{.Description}}</p>
+            <div class="b3-posts__timestamps">
+                <div class="b3-posts__created-at">Created: {{.CreatedAt}}</div>
+                <div class="b3-posts__updated-at">Updated: {{.CreatedAt}}</div>
+            </div>
+            <div>{{.Description}}</div>
         </div>
         {{end}}
     </div>
