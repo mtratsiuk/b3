@@ -32,10 +32,12 @@ type App struct {
 }
 
 type Post struct {
-	Id        PostId
-	FilePath  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id          PostId
+	FilePath    string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Title       template.HTML
+	Description template.HTML
 }
 
 type PostId string
@@ -111,22 +113,17 @@ func (app *App) Build() (map[PostId]*Post, error) {
 			app.log.Debug(fmt.Sprintf("app.Build: rendered post: %v", post))
 
 			posts[post.Id] = &post
-			app.log.Debug(fmt.Sprintf("app.Build: finished processing post: %v", post))
 		}
 	}
 
-	// TODO: render home page
+	if err := app.renderHome(posts); err != nil {
+		return posts, fmt.Errorf("app.Build: failed to render home page: %v", err)
+	}
 
 	return posts, nil
 }
 
 func (app *App) renderPost(post *Post) error {
-	out, err := os.Create(filepath.Join(app.outDirPath, string(post.Id) + ".html"))
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
 	in, err := os.ReadFile(post.FilePath)
 	if err != nil {
 		return err
@@ -136,15 +133,82 @@ func (app *App) renderPost(post *Post) error {
 	if err := goldmark.Convert(in, &buf); err != nil {
 		return err
 	}
+	html := buf.String()
+
+	title, err := getPostTitleHtml(html)
+	if err != nil {
+		return err
+	}
+	post.Title = template.HTML(title)
+
+	description, err := getPostDescriptionHtml(html)
+	if err != nil {
+		return err
+	}
+	post.Description = template.HTML(description)
 
 	data := templates.PostData{
-		Title: string(post.Id),
+		Title:     string(post.Id),
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
-		PostHtml: template.HTML(buf.String()),
+		PostHtml:  template.HTML(html),
 	}
 
-	app.templates.RenderPost(out, data)
+	out, err := os.Create(filepath.Join(app.outDirPath, string(post.Id)+".html"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
 
-	return nil
+	return app.templates.RenderPost(out, data)
+}
+
+func (app *App) renderHome(posts map[PostId]*Post) error {
+	data := templates.HomeData{}
+	data.Title = "b3" // TODO: use config
+	data.Posts = make([]templates.HomePostData, 0)
+
+	for _, p := range posts {
+		data.Posts = append(data.Posts, templates.HomePostData{
+			Title:       p.Title,
+			Description: p.Description,
+			CreatedAt:   p.CreatedAt,
+			UpdatedAt:   p.UpdatedAt,
+			Url:         fmt.Sprintf("%v.html", p.Id), // TODO: strip .html for github pages build
+		})
+	}
+
+	app.log.Debug(fmt.Sprintf("renderHome: data: %v", data))
+
+	out, err := os.Create(filepath.Join(app.outDirPath, "index.html"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	return app.templates.RenderHome(out, data)
+}
+
+// TODO: walk ast
+func getPostTitleHtml(html string) (string, error) {
+	left := strings.Index(html, "<h")
+	right := strings.Index(html, "</h")
+
+	if left == -1 || right == -1 {
+		return "", fmt.Errorf("getPostTitleHtml: expected post to have at least one heading element")
+	}
+
+	return html[left+4 : right], nil
+}
+
+// TODO: walk ast
+func getPostDescriptionHtml(html string) (string, error) {
+	left := strings.Index(html, "<p>")
+	right := strings.Index(html, "</p>")
+
+	if left == -1 || right == -1 {
+		return "", fmt.Errorf("getPostDescriptionHtml: expected post to have at least one paragraph element")
+	}
+
+	return html[left+3 : right], nil
 }

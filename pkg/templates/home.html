@@ -5,7 +5,15 @@
 {{define "body"}}
 <main class="b3-home">
     <div class="b3-posts">
-        Posts list here
+        {{range .Posts}}
+        <div class="b3-post">
+            <a href="{{.Url}}">
+                <h3>{{.Title}}</h3>
+            </a>
+            <span>{{.CreatedAt}}</span>
+            <p>{{.Description}}</p>
+        </div>
+        {{end}}
     </div>
 </main>
 {{end}}
