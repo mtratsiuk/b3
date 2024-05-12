@@ -16,6 +16,7 @@ import (
 	"github.com/mtratsiuk/b3/pkg/timestamper"
 	"github.com/mtratsiuk/b3/pkg/utils"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/parser"
 )
 
 type Params struct {
@@ -147,8 +148,14 @@ func (app *App) renderPost(post *Post) error {
 		return err
 	}
 
+	md := goldmark.New(
+		goldmark.WithParserOptions(
+				parser.WithAutoHeadingID(),
+		),
+)
+
 	var buf bytes.Buffer
-	if err := goldmark.Convert(in, &buf); err != nil {
+	if err := md.Convert(in, &buf); err != nil {
 		return err
 	}
 	html := buf.String()

@@ -30,6 +30,12 @@ func main() {
 }
 ```
 
+```tsx
+const f = () => {
+  return <div>Hi!</div>
+}
+```
+
 ## Lists
 
 - Point one
