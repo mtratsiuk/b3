@@ -1,0 +1,8 @@
+{{define "timestamps"}}
+<div class="b3-timestamps">
+  <span class="b3-timestamps__created-at">{{.CreatedAt.UTC.Format "Mon Jan _2 15:04:05 MST 2006"}}</span>
+  {{if ne .CreatedAt .UpdatedAt}}
+      <span class="b3-timestamps__updated-at">(updated: {{.UpdatedAt.UTC.Format "Mon Jan _2 15:04:05 MST 2006"}})</span>
+  {{end}}
+</div>
+{{end}}

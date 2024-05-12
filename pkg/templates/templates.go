@@ -22,12 +22,12 @@ type Templates struct {
 }
 
 func New(cfg config.Config) (Templates, error) {
-	post, err := template.ParseFS(viewsFs, "base.html", "post.html")
+	post, err := template.ParseFS(viewsFs, "base.html", "components.html", "post.html")
 	if err != nil {
 		return Templates{}, err
 	}
 
-	home, err := template.ParseFS(viewsFs, "base.html", "home.html")
+	home, err := template.ParseFS(viewsFs, "base.html", "components.html", "home.html")
 	if err != nil {
 		return Templates{}, err
 	}

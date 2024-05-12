@@ -10,10 +10,7 @@
             <a href="{{.Url}}" class="b3-posts__title">
                 <h3>{{.Title}}</h3>
             </a>
-            <div class="b3-posts__timestamps">
-                <div class="b3-posts__created-at">Created: {{.CreatedAt}}</div>
-                <div class="b3-posts__updated-at">Updated: {{.CreatedAt}}</div>
-            </div>
+            {{block "timestamps" .}}{{end}}
             <div>{{.Description}}</div>
         </div>
         {{end}}

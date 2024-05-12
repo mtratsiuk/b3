@@ -345,16 +345,18 @@ blockquote {
   .b3-posts__post {
     margin-bottom: var(--space-smaller);
   }
-
-  .b3-posts__timestamps {
-    font-style: italic;
-    font-size: var(--font-size-smaller);
-    margin-bottom: var(--space-smaller);
-  }
 }
 
 /* Styling post page */
 
 .b3-post {
   /* max-width: var(--container-main-width); */
+}
+
+/* Styling components */
+
+.b3-timestamps {
+  font-style: italic;
+  font-size: var(--font-size-smaller);
+  margin-bottom: var(--space-smaller);
 }

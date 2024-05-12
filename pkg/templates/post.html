@@ -4,6 +4,7 @@
 
 {{define "body"}}
 <main class="b3-post border p-1">
+  {{block "timestamps" .}}{{end}}
   {{.PostHtml}}
 </main>
 {{end}}
