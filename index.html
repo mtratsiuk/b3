@@ -15,11 +15,13 @@
 :root {
   --font-size: .6rem;
   --font-size-smaller: .5rem;
+  --font-size-smaller-em: .8em;
   --font-size-smallest: .3rem;
   --font-size-bigger: .7rem;
   --font-size-biggest: .9rem;
 
   --primary-color: #040135e7;
+  --secondary-color: #484852e7;
   --active-color: #3e34fae7;
   --background-color: #ffffff;
   --background-color-second: #bdfbfba7;
@@ -40,8 +42,10 @@
 
 html.dark {
   --primary-color: #ffffff;
+  --secondary-color: #cacae3e7;
   --active-color: #f80b0bc5;
   --background-color: #040135e7;
+  --background-color-second: #2d9393e2;
 }
 
 html,
@@ -254,6 +258,13 @@ pre {
   margin-bottom: var(--space-smaller);
 }
 
+p > code {
+  font-family: monospace;
+  font-size: var(--font-size-smaller-em);
+  background-color: var(--background-color-second);
+  border-radius: var(--border-radius);
+}
+
 h1 {
   font-size: var(--font-size-biggest);
   margin-bottom: var(--space-smaller);
@@ -335,6 +346,23 @@ blockquote {
   }
 }
 
+.b3-theme-toggle {
+  color: var(--active-color);
+
+  &:focus {
+    outline: 2px solid var(--active-color);
+  }
+}
+
+@media screen and (max-width: 512px) {
+  .b3-header__home {
+    order: -2;
+  }
+  .b3-theme-toggle {
+    order: -1;
+  }
+}
+
 /* Styling main block */
 
 .b3-main {
@@ -371,6 +399,7 @@ blockquote {
 
 .b3-timestamps {
   font-style: italic;
+  color: var(--secondary-color);
   font-size: var(--font-size-smaller);
   margin-bottom: var(--space-smaller);
 }
@@ -391,6 +420,7 @@ blockquote {
         <a href="https://www.linkedin.com/in/mtratsiuk/">linkedin.com/in/mtratsiuk</a>
       
     </div>
+    <button id="theme-toggle" class="b3-theme-toggle border border-plain p-smaller">jedi</button>
   </header>
   <div class="b3-main">
     
@@ -405,7 +435,7 @@ blockquote {
 <div class="b3-timestamps">
   <span class="b3-timestamps__created-at">Fri May 10 20:20:31 UTC 2024</span>
   
-      <span class="b3-timestamps__updated-at">(updated: Sun May 12 13:28:55 UTC 2024)</span>
+      <span class="b3-timestamps__updated-at">(updated: Sun May 12 15:00:35 UTC 2024)</span>
   
 </div>
 
@@ -473,6 +503,22 @@ Even more <strong>important</strong> than the last one obviously.</div>
 </main>
 
   </div>
+
+  <script>(function () {
+  var DARK_THEME_CLASSNAME = "dark";
+
+  var themeToggle = document.getElementById("theme-toggle");
+  var state = themeToggle.textContent
+
+  themeToggle.addEventListener("click", function () {
+    document.documentElement.classList.toggle(DARK_THEME_CLASSNAME);
+
+    state = state === "jedi" ? "sith" : "jedi"
+
+    themeToggle.textContent = state
+  });
+})();
+</script>
 </body>
 
 </html>
