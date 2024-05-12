@@ -23,6 +23,7 @@ type Params struct {
 	Log      *slog.Logger
 	Verbose  bool
 	RootPath string
+	Prod     bool
 }
 
 type App struct {
@@ -196,17 +197,23 @@ func (app *App) renderPost(post *Post) error {
 
 func (app *App) renderHome(posts map[PostId]*Post) error {
 	data := templates.HomeData{}
-	data.Title = "b3" // TODO: use config
+	data.Title = app.config.DocTitle
 	data.Posts = make([]templates.HomePostData, 0)
 
 	for _, p := range posts {
+		url := filepath.Join(".", strings.TrimPrefix(p.HtmlFilePath, filepath.Clean(app.outDirPath)))
+
+		if app.params.Prod && app.config.StripHtmlExtInProdLinks {
+			url, _ = strings.CutSuffix(url, ".html")
+		}
+
 		data.Posts = append(data.Posts, templates.HomePostData{
 			Id:          string(p.Id),
 			Title:       p.Title,
 			Description: p.Description,
 			CreatedAt:   p.CreatedAt,
 			UpdatedAt:   p.UpdatedAt,
-			Url:         filepath.Join(".", strings.TrimPrefix(p.HtmlFilePath, filepath.Clean(app.outDirPath))), // TODO: strip .html for github pages build
+			Url:         url,
 		})
 	}
 

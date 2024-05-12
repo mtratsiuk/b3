@@ -13,6 +13,7 @@ import (
 var verbose bool
 var help bool
 var rootPath string
+var prod bool
 
 func init() {
 	wd, err := os.Getwd()
@@ -24,6 +25,7 @@ func init() {
 	flag.StringVar(&rootPath, "root", wd, "path to the blog's root directory (folder containing 'b3.json')")
 	flag.BoolVar(&verbose, "v", false, "verbose logging (debug)")
 	flag.BoolVar(&help, "h", false, "print help (usage)")
+	flag.BoolVar(&prod, "prod", false, "enable production build")
 }
 
 func main() {
@@ -37,7 +39,19 @@ func main() {
 
 	log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
 
-	log.Debug(fmt.Sprintf("got args: verbose=%v, help=%v, rootPath=%v", verbose, help, rootPath))
+	log.Debug(
+		fmt.Sprintf(`got args:
+verbose=%v,
+help=%v,
+rootPath=%v,
+prod=%v
+`,
+			verbose,
+			help,
+			rootPath,
+			prod,
+		),
+	)
 
 	if help {
 		flag.PrintDefaults()
@@ -47,6 +61,7 @@ func main() {
 		Log:      log,
 		Verbose:  verbose,
 		RootPath: rootPath,
+		Prod:     prod,
 	})
 
 	if err != nil {

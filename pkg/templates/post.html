@@ -1,6 +1,6 @@
 {{template "base.html" .}}
 
-{{define "title"}}{{.Title}}{{end}}
+{{define "title"}}{{.Config.DocTitle}} - {{.Title}}{{end}}
 
 {{define "body"}}
 <main class="b3-post border p-1">

@@ -10,11 +10,13 @@ import (
 const CONFIG_FILE_NAME = "b3.json"
 
 type Config struct {
-	PostsGlob     []string           `json:"posts_glob"`
-	OutDirPath    string             `json:"out_dir_path"`
-	AssetsDirPath []string           `json:"assets_dir_path"`
-	HomeLink      string             `json:"home_link"`
-	HeaderLinks   []ConfigHeaderLink `json:"header_links"`
+	PostsGlob               []string           `json:"posts_glob"`
+	OutDirPath              string             `json:"out_dir_path"`
+	AssetsDirPath           []string           `json:"assets_dir_path"`
+	HomeLink                string             `json:"home_link"`
+	HeaderLinks             []ConfigHeaderLink `json:"header_links"`
+	DocTitle                string             `json:"doc_title"`
+	StripHtmlExtInProdLinks bool               `json:"strip_html_ext_in_prod_links"`
 }
 
 type ConfigHeaderLink struct {

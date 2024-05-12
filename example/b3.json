@@ -20,5 +20,7 @@
       "name": "linkedin.com/in/mtratsiuk",
       "url": "https://www.linkedin.com/in/mtratsiuk/"
     }
-  ]
+  ],
+  "doc_title": "b3",
+  "strip_html_ext_in_prod_links": true
 }

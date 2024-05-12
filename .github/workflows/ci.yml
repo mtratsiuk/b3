@@ -19,7 +19,7 @@ jobs:
           go-version: '1.21.x'
 
     - name: Build Example
-      run: ./bin/run_example.sh
+      run: ./bin/run_example.sh --prod
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v4
