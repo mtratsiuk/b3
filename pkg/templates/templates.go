@@ -15,6 +15,9 @@ var viewsFs embed.FS
 //go:embed base.css
 var baseCss template.CSS
 
+//go:embed base.js
+var baseJs template.JS
+
 type Templates struct {
 	config config.Config
 	post   *template.Template
@@ -39,6 +42,7 @@ func New(cfg config.Config) (Templates, error) {
 type BaseData[T any] struct {
 	Title    string
 	Css      template.CSS
+	Js       template.JS
 	Config   config.Config
 	PageData T
 }
@@ -54,6 +58,7 @@ func (t Templates) RenderPost(wr io.Writer, data PostData) error {
 	return t.post.ExecuteTemplate(wr, "post.html", BaseData[PostData]{
 		Title:    data.Title,
 		Css:      baseCss,
+		Js:       baseJs,
 		Config:   t.config,
 		PageData: data,
 	})
@@ -77,6 +82,7 @@ func (t Templates) RenderHome(wr io.Writer, data HomeData) error {
 	return t.home.ExecuteTemplate(wr, "home.html", BaseData[HomeData]{
 		Title:    data.Title,
 		Css:      baseCss,
+		Js:       baseJs,
 		Config:   t.config,
 		PageData: data,
 	})

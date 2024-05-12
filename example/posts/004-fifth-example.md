@@ -24,6 +24,10 @@ Here are a few images:
 
 ## Code snippets
 
+Inline code: `if err != nil { return err }`.
+
+Code blocks:
+
 ```go
 func main() {
   panic()
