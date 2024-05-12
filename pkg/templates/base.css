@@ -313,6 +313,13 @@ blockquote {
   }
 }
 
+@media screen and (max-width: 512px) {
+  .b3-header {
+    position: relative;
+    top: initial
+  }
+}
+
 .b3-header__links {
   gap: var(--space-smallest);
 
