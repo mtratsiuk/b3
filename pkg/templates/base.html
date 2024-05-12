@@ -5,6 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{block "title" .}}{{end}}</title>
+  <script>{{.Js}}</script>
   <style>{{.Css}}</style>
 </head>
 
@@ -23,8 +24,6 @@
   <div class="b3-main">
     {{block "body" .PageData}}{{end}}
   </div>
-
-  <script>{{.Js}}</script>
 </body>
 
 </html>
