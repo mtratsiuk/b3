@@ -352,18 +352,20 @@ blockquote {
   .b3-posts__post {
     margin-bottom: var(--space-smaller);
   }
-
-  .b3-posts__timestamps {
-    font-style: italic;
-    font-size: var(--font-size-smaller);
-    margin-bottom: var(--space-smaller);
-  }
 }
 
 /* Styling post page */
 
 .b3-post {
   /* max-width: var(--container-main-width); */
+}
+
+/* Styling components */
+
+.b3-timestamps {
+  font-style: italic;
+  font-size: var(--font-size-smaller);
+  margin-bottom: var(--space-smaller);
 }
 </style>
 </head>
@@ -386,6 +388,12 @@ blockquote {
   <div class="b3-main">
     
 <main class="b3-post border p-1">
+  
+<div class="b3-timestamps">
+  <span class="b3-timestamps__created-at">Sun May 12 12:51:34 UTC 2024</span>
+  
+</div>
+
   <h1>Third example post</h1>
 <p>Third post.</p>
 
