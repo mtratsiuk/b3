@@ -150,9 +150,9 @@ func (app *App) renderPost(post *Post) error {
 
 	md := goldmark.New(
 		goldmark.WithParserOptions(
-				parser.WithAutoHeadingID(),
+			parser.WithAutoHeadingID(),
 		),
-)
+	)
 
 	var buf bytes.Buffer
 	if err := md.Convert(in, &buf); err != nil {
@@ -250,7 +250,7 @@ func getPostTitleHtml(html string) (string, error) {
 		return "", fmt.Errorf("getPostTitleHtml: expected post to have at least one heading element")
 	}
 
-	return html[left+4 : right], nil
+	return html[strings.Index(html, ">")+1 : right], nil
 }
 
 // TODO: walk ast
