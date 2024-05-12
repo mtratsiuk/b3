@@ -320,6 +320,13 @@ blockquote {
   }
 }
 
+@media screen and (max-width: 512px) {
+  .b3-header {
+    position: relative;
+    top: initial
+  }
+}
+
 .b3-header__links {
   gap: var(--space-smallest);
 
@@ -390,38 +397,42 @@ blockquote {
 <main class="b3-post border p-1">
   
 <div class="b3-timestamps">
-  <span class="b3-timestamps__created-at">Sun May 12 12:51:34 UTC 2024</span>
+  <span class="b3-timestamps__created-at">Sun May 12 13:29:35 UTC 2024</span>
   
 </div>
 
-  <h1>Fifth example post</h1>
+  <h1 id="fifth-example-post">Fifth example post</h1>
 <p>Another important text.
 Even more <strong>important</strong> than the last one obviously.</p>
-<h2>Header 2</h2>
+<h2 id="header-2">Header 2</h2>
 <p>More text here.</p>
 <p>Even more after blank line.</p>
-<h2>Quotes</h2>
+<h2 id="quotes">Quotes</h2>
 <p>Here is a quote:</p>
 <blockquote>
 <p>Some quote.</p>
 </blockquote>
-<h2>Images</h2>
+<h2 id="images">Images</h2>
 <p>Here are a few images:</p>
 <p><img src="../assets/rock.png" alt="rock">
 <img src="../assets/nested/player.png" alt="player">
 <img src="../assets/nested/cheese.svg" alt="cheese"></p>
-<h2>Code snippets</h2>
+<h2 id="code-snippets">Code snippets</h2>
 <pre><code class="language-go">func main() {
   panic()
 }
 </code></pre>
-<h2>Lists</h2>
+<pre><code class="language-tsx">const f = () =&gt; {
+  return &lt;div&gt;Hi!&lt;/div&gt;
+}
+</code></pre>
+<h2 id="lists">Lists</h2>
 <ul>
 <li>Point one</li>
 <li>Point two</li>
 <li>Point three</li>
 </ul>
-<h2>Links</h2>
+<h2 id="links">Links</h2>
 <ul>
 <li><a href="https://misha.spris.dev">https://misha.spris.dev</a></li>
 <li><a href="https://github.com/mtratsiuk/b3">https://github.com/mtratsiuk/b3</a></li>
