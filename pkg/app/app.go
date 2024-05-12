@@ -257,7 +257,7 @@ func getPostTitleHtml(html string) (string, error) {
 		return "", fmt.Errorf("getPostTitleHtml: expected post to have at least one heading element")
 	}
 
-	return html[strings.Index(html, ">")+1 : right], nil
+	return html[strings.Index(html[left:], ">")+1 : right], nil
 }
 
 // TODO: walk ast
