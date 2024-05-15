@@ -4,4 +4,4 @@ set -exu
 
 cd "$(dirname "$0")"/..
 
-go run ./cmd/cli/cli.go --root=./example -v $@
+go run ./cmd/b3/main.go --root=./example -v $@
