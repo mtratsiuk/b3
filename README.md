@@ -3,3 +3,7 @@
 Boring blog builder
 
 WIP
+
+```sh
+go install github.com/mtratsiuk/b3/cmd/b3@latest
+```
