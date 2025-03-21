@@ -24,6 +24,7 @@ type Params struct {
 	Verbose  bool
 	RootPath string
 	Prod     bool
+	DryRun   bool
 }
 
 type App struct {
@@ -59,6 +60,13 @@ func New(params Params) (App, error) {
 	tmplts, err := templates.New(cfg)
 	if err != nil {
 		return App{}, fmt.Errorf("app.New: failed to load templates: %v", err)
+	}
+
+	if cfg.DotEnvPath != "" {
+		if err := utils.LoadDotEnv(filepath.Join(params.RootPath, cfg.DotEnvPath)); err != nil {
+			return App{}, fmt.Errorf("app.New: failed to load env variables from dotenv file: %v", err)
+		}
+		params.Log.Debug("app.New: loaded dotenv file")
 	}
 
 	return App{

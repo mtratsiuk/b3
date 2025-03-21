@@ -14,6 +14,7 @@ var verbose bool
 var help bool
 var rootPath string
 var prod bool
+var dry bool
 
 func init() {
 	wd, err := os.Getwd()
@@ -26,6 +27,7 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose logging (debug)")
 	flag.BoolVar(&help, "h", false, "print help (usage)")
 	flag.BoolVar(&prod, "prod", false, "enable production build")
+	flag.BoolVar(&dry, "dry", false, "execute in dry-run mode (preview affected assets before making actual CDN uploads)")
 }
 
 func main() {
@@ -44,12 +46,14 @@ func main() {
 verbose=%v,
 help=%v,
 rootPath=%v,
-prod=%v
+prod=%v,
+dry=%v,
 `,
 			verbose,
 			help,
 			rootPath,
 			prod,
+			dry,
 		),
 	)
 
@@ -62,6 +66,7 @@ prod=%v
 		Verbose:  verbose,
 		RootPath: rootPath,
 		Prod:     prod,
+		DryRun:   dry,
 	})
 
 	if err != nil {

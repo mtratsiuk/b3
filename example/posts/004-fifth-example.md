@@ -22,6 +22,10 @@ Here are a few images:
 ![player](../assets/nested/player.png)
 ![cheese](../assets/nested/cheese.svg)
 
+## Images auto-uploaded to CDN
+
+![player](../cdn/player.png)
+
 ## Code snippets
 
 Inline code: `if err != nil { return err }`.

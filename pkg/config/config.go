@@ -11,8 +11,10 @@ const CONFIG_FILE_NAME = "b3.json"
 
 type Config struct {
 	PostsGlob               []string           `json:"posts_glob"`
+	AssetsToUploadGlob      []string           `json:"assets_to_upload_glob"`
 	OutDirPath              string             `json:"out_dir_path"`
 	AssetsDirPath           []string           `json:"assets_dir_path"`
+	DotEnvPath              string             `json:"dot_env_path"`
 	HomeLink                string             `json:"home_link"`
 	HeaderLinks             []ConfigHeaderLink `json:"header_links"`
 	DocTitle                string             `json:"doc_title"`
