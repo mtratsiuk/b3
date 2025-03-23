@@ -203,7 +203,7 @@ func (app *App) renderPost(post *Post) error {
 	post.Description = template.HTML(description)
 
 	data := templates.PostData{
-		Title:     string(post.Id),
+		Title:     title,
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
 		PostHtml:  template.HTML(html),
