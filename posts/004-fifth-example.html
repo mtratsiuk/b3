@@ -295,6 +295,16 @@ img {
   margin-bottom: var(--space);
 }
 
+p:has(> img + em) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+p:has(> img + em) > img {
+  margin-bottom: var(--space-smallest);
+}
+
 pre {
   font-family: monospace;
   font-size: var(--font-size-smaller);
@@ -480,7 +490,7 @@ blockquote {
 <div class="b3-timestamps">
   <span class="b3-timestamps__created-at">Fri May 10 20:20:31 UTC 2024</span>
   
-      <span class="b3-timestamps__updated-at">(updated: Sun Mar 23 00:32:37 UTC 2025)</span>
+      <span class="b3-timestamps__updated-at">(updated: Sun Mar 23 13:54:29 UTC 2025)</span>
   
 </div>
 
@@ -501,7 +511,8 @@ Even more <strong>important</strong> than the last one obviously.</p>
 <img src="../assets/nested/player.png" alt="player">
 <img src="../assets/nested/cheese.svg" alt="cheese"></p>
 <h2 id="images-auto-uploaded-to-cdn">Images auto-uploaded to CDN</h2>
-<p><img src="https://assets.spris.dev/blog/kOUZ522aCJ9rfGsv8JTiNj0RdbucfC5643GVKI0InpY=.png" alt="player"></p>
+<p><img src="https://assets.spris.dev/blog/kOUZ522aCJ9rfGsv8JTiNj0RdbucfC5643GVKI0InpY=.png" alt="player">
+<em>Caption for the image</em></p>
 <h2 id="code-snippets">Code snippets</h2>
 <p>Inline code: <code>if err != nil { return err }</code>.</p>
 <p>Code blocks:</p>
