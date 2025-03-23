@@ -24,5 +24,6 @@
     }
   ],
   "doc_title": "b3",
+  "doc_description": "boring blog generator",
   "strip_html_ext_in_prod_links": true
 }

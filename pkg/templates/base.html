@@ -4,6 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="{{block "title" .}}{{end}}" />
+  <meta property="og:description" content="{{block "description" .}}{{end}}" />
   <title>{{block "title" .}}{{end}}</title>
   <script>{{.Js}}</script>
   <style>{{.Css}}</style>

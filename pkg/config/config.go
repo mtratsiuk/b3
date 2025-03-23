@@ -18,6 +18,7 @@ type Config struct {
 	HomeLink                string             `json:"home_link"`
 	HeaderLinks             []ConfigHeaderLink `json:"header_links"`
 	DocTitle                string             `json:"doc_title"`
+	DocDescription          string             `json:"doc_description"`
 	StripHtmlExtInProdLinks bool               `json:"strip_html_ext_in_prod_links"`
 }
 

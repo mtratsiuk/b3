@@ -203,10 +203,11 @@ func (app *App) renderPost(post *Post) error {
 	post.Description = template.HTML(description)
 
 	data := templates.PostData{
-		Title:     title,
-		CreatedAt: post.CreatedAt,
-		UpdatedAt: post.UpdatedAt,
-		PostHtml:  template.HTML(html),
+		Title:       title,
+		Description: utils.StripHtml(description),
+		CreatedAt:   post.CreatedAt,
+		UpdatedAt:   post.UpdatedAt,
+		PostHtml:    template.HTML(html),
 	}
 
 	postOutDirPath := filepath.Join(app.outDirPath, strings.TrimPrefix(filepath.Dir(post.FilePath), filepath.Clean(app.params.RootPath)))
@@ -227,6 +228,7 @@ func (app *App) renderPost(post *Post) error {
 func (app *App) renderHome(posts map[PostId]*Post) error {
 	data := templates.HomeData{}
 	data.Title = app.config.DocTitle
+	data.Description = app.config.DocDescription
 	data.Posts = make([]templates.HomePostData, 0)
 
 	for _, p := range posts {
