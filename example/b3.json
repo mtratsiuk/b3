@@ -3,10 +3,7 @@
   "posts_glob": [
     "./posts/*.md"
   ],
-  "assets_to_upload_glob": [
-    "./cdn/*.jpeg",
-    "./cdn/*.jpg"
-  ],
+  "assets_to_upload_regexp": "^\\.\\./cdn/.*\\.((jpe?g)|(png)|(svg))$",
   "assets_dir_path": [
     "./assets"
   ],

@@ -19,8 +19,8 @@ func LoadDotEnv(path string) error {
 	}
 
 	for idx, line := range strings.Split(strings.TrimSpace(string(dotenv)), "\n") {
-		// Ignore comments
-		if strings.HasPrefix(line, "#") {
+		// Ignore comments and empty lines
+		if strings.HasPrefix(line, "#") || strings.TrimSpace(line) == "" {
 			continue
 		}
 

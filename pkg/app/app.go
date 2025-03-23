@@ -7,10 +7,12 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/mtratsiuk/b3/pkg/cdn"
 	"github.com/mtratsiuk/b3/pkg/config"
 	"github.com/mtratsiuk/b3/pkg/templates"
 	"github.com/mtratsiuk/b3/pkg/timestamper"
@@ -34,6 +36,7 @@ type App struct {
 	outDirPath  string
 	timestamper timestamper.Timestamper
 	templates   templates.Templates
+	cdn         cdn.Cdn
 }
 
 type Post struct {
@@ -51,6 +54,8 @@ type PostId string
 type Posts = map[PostId]*Post
 
 func New(params Params) (App, error) {
+	app := App{}
+
 	cfg, err := config.New(params.RootPath)
 	if err != nil {
 		return App{}, fmt.Errorf("app.New: failed to create config: %v", err)
@@ -69,14 +74,22 @@ func New(params Params) (App, error) {
 		params.Log.Debug("app.New: loaded dotenv file")
 	}
 
-	return App{
-		log:         params.Log,
-		params:      params,
-		config:      cfg,
-		outDirPath:  filepath.Join(params.RootPath, cfg.OutDirPath),
-		timestamper: timestamper.NewGit(),
-		templates:   tmplts,
-	}, nil
+	app.log = params.Log
+	app.params = params
+	app.config = cfg
+	app.outDirPath = filepath.Join(params.RootPath, cfg.OutDirPath)
+	app.timestamper = timestamper.NewGit()
+	app.templates = tmplts
+
+	if cfg.AssetsToUploadRegexp != "" {
+		cdn, err := cdn.New()
+		if err != nil {
+			return App{}, fmt.Errorf("app.New: failed to create cdn: %v", err)
+		}
+		app.cdn = cdn
+	}
+
+	return app, nil
 }
 
 func (app *App) ResolveRelativePath(path string) string {
@@ -102,6 +115,14 @@ func (app *App) Build() (Posts, error) {
 	}
 
 	return posts, nil
+}
+
+func (app *App) Cdn() error {
+	if err := app.uploadAssets(); err != nil {
+		return fmt.Errorf("app.Cdn: failed to upload assets to cdn: %v", err)
+	}
+
+	return nil
 }
 
 func (app *App) renderPosts() (Posts, error) {
@@ -244,6 +265,79 @@ func (app *App) renderHome(posts map[PostId]*Post) error {
 	defer out.Close()
 
 	return app.templates.RenderHome(out, data)
+}
+
+func (app *App) uploadAssets() error {
+	if app.config.AssetsToUploadRegexp == "" {
+		app.log.Debug("uploadAssets: nothing to do, `assets_to_upload_regexp` is not defined")
+		return nil
+	}
+
+	for _, pg := range app.config.PostsGlob {
+		glob := app.ResolveRelativePath(pg)
+
+		matches, err := filepath.Glob(glob)
+
+		if err != nil {
+			return fmt.Errorf("uploadAssets: failed to match glob pattern '%v': %v", glob, err)
+		}
+
+		for _, m := range matches {
+			app.log.Debug(fmt.Sprintf("uploadAssets: processing file %v", m))
+
+			post, err := os.ReadFile(m)
+			if err != nil {
+				return fmt.Errorf("uploadAssets: failed read post file: %v", err)
+			}
+
+			updatedPost, err := app.uploadAssetsForPost(string(post), filepath.Dir(m))
+			if err != nil {
+				return fmt.Errorf("uploadAssets: failed process post %v: %v", m, err)
+			}
+
+			if err := os.WriteFile(m, []byte(updatedPost), 0644); err != nil {
+				return fmt.Errorf("uploadAssets: failed to write updated post %v: %v", m, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+var imageRe = regexp.MustCompile(`!\[.*\]\((.*)\)`)
+
+func (app *App) uploadAssetsForPost(content, postDirPath string) (string, error) {
+	uploadRe := regexp.MustCompile(app.config.AssetsToUploadRegexp)
+	updatedContent := content
+
+	for _, match := range imageRe.FindAllStringSubmatch(content, -1) {
+		imageMd := match[0]
+		imagePath := match[1]
+		upload := uploadRe.MatchString(imagePath)
+
+		if !upload {
+			app.log.Debug(fmt.Sprintf("uploadAssetsForPost: skipping asset: %v", imageMd))
+			continue
+		}
+
+		app.log.Debug(fmt.Sprintf("uploadAssetsForPost: processing asset: %v", imageMd))
+
+		if app.params.DryRun {
+			continue
+		}
+
+		publicUrl, err := app.cdn.UploadAsset(filepath.Join(postDirPath, imagePath))
+		if err != nil {
+			return content, fmt.Errorf("uploadAssetsForPost: failed to upload asset: %v: %v", imageMd, err)
+		}
+
+		app.log.Debug(fmt.Sprintf("uploadAssetsForPost: uploaded asset: %v to %v", imageMd, publicUrl))
+
+		updatedMd := strings.ReplaceAll(imageMd, imagePath, publicUrl)
+		updatedContent = strings.ReplaceAll(updatedContent, imageMd, updatedMd)
+	}
+
+	return updatedContent, nil
 }
 
 func (app *App) copyAssets() error {

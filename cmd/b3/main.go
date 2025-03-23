@@ -15,6 +15,7 @@ var help bool
 var rootPath string
 var prod bool
 var dry bool
+var mode string
 
 func init() {
 	wd, err := os.Getwd()
@@ -24,6 +25,7 @@ func init() {
 	}
 
 	flag.StringVar(&rootPath, "root", wd, "path to the blog's root directory (folder containing 'b3.json')")
+	flag.StringVar(&mode, "mode", "build", "'build' - build html files from markdown posts\n'cdn' - upload assets to cdn and replace urls in markdown files")
 	flag.BoolVar(&verbose, "v", false, "verbose logging (debug)")
 	flag.BoolVar(&help, "h", false, "print help (usage)")
 	flag.BoolVar(&prod, "prod", false, "enable production build")
@@ -48,17 +50,20 @@ help=%v,
 rootPath=%v,
 prod=%v,
 dry=%v,
+mode=%v,
 `,
 			verbose,
 			help,
 			rootPath,
 			prod,
 			dry,
+			mode,
 		),
 	)
 
 	if help {
 		flag.PrintDefaults()
+		os.Exit(0)
 	}
 
 	b3app, err := app.New(app.Params{
@@ -74,7 +79,22 @@ dry=%v,
 		os.Exit(1)
 	}
 
-	if _, err := b3app.Build(); err != nil {
-		log.Error(fmt.Sprintf("main: failed to build: %v", err))
+	var cmd func() error
+
+	if mode == "cdn" {
+		cmd = b3app.Cdn
+	} else if mode == "build" {
+		cmd = func() error {
+			_, err := b3app.Build()
+			return err
+		}
+	} else {
+		log.Error(fmt.Sprintf("main: unexpected mode: %v", mode))
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	if err := cmd(); err != nil {
+		log.Error(fmt.Sprintf("main: failed to run b3: %v", err))
 	}
 }
