@@ -25,6 +25,7 @@ Here are a few images:
 ## Images auto-uploaded to CDN
 
 ![player](https://assets.spris.dev/blog/kOUZ522aCJ9rfGsv8JTiNj0RdbucfC5643GVKI0InpY=.png)
+_Caption for the image_
 
 ## Code snippets
 
