@@ -21,8 +21,6 @@ import (
 	"github.com/yuin/goldmark/parser"
 )
 
-const TRIM_POST_META_DESCRIPTION_AT = 128
-
 type Params struct {
 	Log      *slog.Logger
 	Verbose  bool
@@ -206,7 +204,7 @@ func (app *App) renderPost(post *Post) error {
 
 	data := templates.PostData{
 		Title:       title,
-		Description: utils.TrimText(utils.StripHtml(description), TRIM_POST_META_DESCRIPTION_AT),
+		Description: utils.TrimText(utils.StripHtml(description), app.config.TrimPostOgDescriptionsAt),
 		CreatedAt:   post.CreatedAt,
 		UpdatedAt:   post.UpdatedAt,
 		PostHtml:    template.HTML(html),

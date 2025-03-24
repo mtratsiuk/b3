@@ -5,7 +5,7 @@ import (
 )
 
 func TrimText(input string, breakAt int) string {
-	if len(input)-1 <= breakAt {
+	if len(input)-1 <= breakAt || breakAt < 0 {
 		return input
 	}
 
