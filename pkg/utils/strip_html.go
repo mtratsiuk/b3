@@ -5,8 +5,10 @@ import (
 	"strings"
 )
 
-var tagRe = regexp.MustCompile(`<.*?>`)
+var re = regexp.MustCompile(`(<.*?>)|\s`)
+var spaceRe = regexp.MustCompile(`\s+`)
+var space = " "
 
 func StripHtml(input string) string {
-	return strings.TrimSpace(strings.ReplaceAll(tagRe.ReplaceAllString(input, ""), "\n", " "))
+	return strings.TrimSpace(spaceRe.ReplaceAllString(re.ReplaceAllString(input, space), space))
 }
