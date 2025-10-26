@@ -27,6 +27,11 @@ Here are a few images:
 ![player](https://assets.spris.dev/blog/kOUZ522aCJ9rfGsv8JTiNj0RdbucfC5643GVKI0InpY=.png)
 _Caption for the image_
 
+## Videos auto-uploaded to CDN
+
+![video](https://assets.spris.dev/blog/ziH5t8a4k+T2n7HDO3U6+5PFXA+FQqo9O/8exTcPhNs=.mp4)
+_[Ranger2 gamedev playlist](https://www.youtube.com/playlist?list=PLIuDQ16oLqqYN3-8fvQbsDN4Vs2kLrmQK)_
+
 ## Code snippets
 
 Inline code: `if err != nil { return err }`.

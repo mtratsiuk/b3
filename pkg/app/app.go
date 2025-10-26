@@ -188,7 +188,11 @@ func (app *App) renderPost(post *Post) error {
 	if err := md.Convert(in, &buf); err != nil {
 		return err
 	}
-	html := buf.String()
+
+	html, err := app.postProcessPostHtml(buf.String())
+	if err != nil {
+		return err
+	}
 
 	title, err := getPostTitleHtml(html)
 	if err != nil {
@@ -340,6 +344,28 @@ func (app *App) uploadAssetsForPost(content, postDirPath string) (string, error)
 	}
 
 	return updatedContent, nil
+}
+
+var imageHtmlRe = regexp.MustCompile(`<img src="(.*?)".*?>`)
+var supportedVideoExts = []string{".mp4", ".webm"}
+
+func (app *App) postProcessPostHtml(html string) (string, error) {
+	updatedHtml := html
+
+	// Replace <img> tags with <video> if src refers to a video format
+	for _, match := range imageHtmlRe.FindAllStringSubmatch(html, -1) {
+		imgHtml := match[0]
+		imgSrc := match[1]
+		imgExt := imgSrc[strings.LastIndex(imgSrc, "."):]
+
+		if !slices.Contains(supportedVideoExts, imgExt) {
+			continue
+		}
+
+		updatedHtml = strings.ReplaceAll(updatedHtml, imgHtml, fmt.Sprintf(`<video controls src="%v"></video>`, imgSrc))
+	}
+
+	return updatedHtml, nil
 }
 
 func (app *App) copyAssets() error {
