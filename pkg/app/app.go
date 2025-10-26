@@ -358,7 +358,7 @@ func (app *App) postProcessPostHtml(html string) (string, error) {
 		imgSrc := match[1]
 		imgExt := imgSrc[strings.LastIndex(imgSrc, "."):]
 
-		if !slices.Contains(supportedVideoExts, imgExt) {
+		if !slices.Contains(supportedVideoExts, strings.ToLower(imgExt)) {
 			continue
 		}
 
