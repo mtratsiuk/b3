@@ -289,7 +289,8 @@ a:active {
 
 /* Styling markdown-generated content */
 
-img {
+img,
+video {
   display: inline-block;
   max-width: 100%;
   border: var(--border-size-smaller) solid var(--primary-color);
@@ -297,13 +298,14 @@ img {
   margin-bottom: var(--space);
 }
 
-p:has(> img + em) {
+p:has(> img, video + em) {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-p:has(> img + em) > img {
+p:has(> img, video + em)>img,
+video {
   margin-bottom: var(--space-smallest);
 }
 
@@ -498,7 +500,7 @@ blockquote {
 <div class="b3-timestamps">
   <span class="b3-timestamps__created-at">Fri May 10 20:20:31 UTC 2024</span>
   
-      <span class="b3-timestamps__updated-at">(updated: Sun Mar 23 13:54:29 UTC 2025)</span>
+      <span class="b3-timestamps__updated-at">(updated: Sun Oct 26 16:53:43 UTC 2025)</span>
   
 </div>
 
